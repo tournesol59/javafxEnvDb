@@ -1,0 +1,70 @@
+package openjfxforlist.javafx;
+
+import openjfxforlist.javafx.database.Person;
+import openjfxforlist.javafx.database.Article;
+import openjfxforlist.javafx.database.DataModel;
+import openjfxforlist.javafx.database.DataModelText;
+
+import java.io.IOException;
+
+import javafx.util.Callback;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+
+public class EditPersonView extends VBox {
+    // controller dependency
+    final CreateSchemeController createSchemeController;
+
+    private Label titleLabel = new Label("enter the modified title");
+
+    //VBox vboxform = new VBox();
+    HBox hboxform = new HBox();
+    TextArea firstNameText = new TextArea();
+    TextArea lastNameText = new TextArea(); 
+    Button savebtn = new Button("update field");
+    Button clearbtn = new Button("clear field");
+
+    public EditPersonView(CreateSchemeController createSchemeController) {
+		// no more dependency to controller
+        this.createSchemeController = createSchemeController;
+        initEditPerson();
+		// The switching will be done in the controller
+    }
+
+        public CreateSchemeController getController() {
+            return this.createSchemeController;
+        }
+/*
+        public void setController(CreateSchemeController createSchemeController) {
+            this.createSchemeController = createSchemeController;
+        }
+*/
+    public void initEditPerson() {
+	    // exchange data from CreatechemeView
+	// define clear text action
+        clearbtn.setOnAction(event -> {
+	   firstNameText.setText("");
+	});
+        // define go back to CreateSchemeView action
+	savebtn.setOnAction(event -> {
+          // TBC
+	  System.out.println("edit person save button was clicked");
+	  // boolean okClicked = App.loadView("CreateSchemeView");
+	});
+	hboxform.getChildren().addAll(savebtn, clearbtn);
+//	vboxform.getChildren().addAll(titleLabel, firstNameText, lastNameText, hboxform);
+	this.getChildren().addAll(titleLabel, firstNameText, lastNameText, hboxform);
+	
+    }
+}

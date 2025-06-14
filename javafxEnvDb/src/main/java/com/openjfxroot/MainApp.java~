@@ -1,0 +1,98 @@
+package com.openjfxroot;
+
+import com.openjfxroot.base.*;
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.Iterable;
+import java.util.Iterator;
+import java.util.ListIterator;
+
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+
+
+public class MainApp extends Application {
+   
+   private Stage primaryStage;
+
+   static DataClientModelDB dataClientModel; // no: singleton =new DataClientModelDB();
+   static CreateSchemeArtController schemeController;
+
+   @Override
+   public void start(Stage stage) {
+      primaryStage = stage;
+      primaryStage.setTitle("Gestion des Articles tech");
+      if (schemeController == null) {
+         schemeController = new CreateSchemeArtController(stage);
+	 schemeController.initialize();
+	 schemeController.setMainApp(this);
+      }
+   }
+
+   public static void main(String[] args) {
+      // apart test:
+      subTest();
+      // java fx:
+      //launch();
+   }
+
+   public static void subTest() {
+      Client aClient=null;
+      List<Client> listClient=null;
+      ListIterator<Client> listIterator = null;
+      int number=0;
+      Connection testconnect=null;
+
+      try {
+	System.out.println("Start of MainApp main manual code");
+        //Class.forName ("org.h2.Driver");    
+        //testconnect = DriverManager.getConnection("jdbc:h2:~/testdb", "SA", "");
+
+	//Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        //testconnect = DriverManager.getConnection("jdbc:hsqldb:file:/Users/frede/hsqldb/ouvragesdb", "SA", "");
+
+	Class.forName("com.mysql.cj.jdbc.Driver");
+        testconnect = DriverManager.getConnection("jdbc:mysql://localhost:3306/ouvragesdb", "root", "");
+	System.out.println("Connected manually to the MySQL database");
+      } catch (Exception e) {
+          System.out.println("Main App manually connection failed");
+      }
+  
+      try {
+        Statement stmt = testconnect.createStatement();
+	ResultSet result = stmt.executeQuery("SELECT last_name FROM tblclient");
+	
+	while (result.next()) {
+           System.out.println("found client with name: " + result.getString(1));
+	}
+	result.close();
+	//testconnect.close();
+
+	System.out.println("Connection the database normally closed");
+      } catch (SQLException e) {
+          System.out.println("Main App manually query failed");
+      }
+      // //      
+      // second part: back-end test
+      try {
+	 // recupere singleton
+         dataClientModel = DataClientModelDB.getInstance();
+         System.out.println("Main subTest: dataclientmodel instanciated");
+         listClient = dataClientModel.loadData();
+         listIterator = listClient.listIterator();
+         while (listIterator.hasNext()) {
+	   number++;
+           aClient = listIterator.next();
+	   System.out.println("Client name: "+aClient.getLastName());
+         }
+      } catch (Exception e) {
+         System.out.println("MainApp call to ClientModelDB failed");
+      }
+   }
+   
+}
+

@@ -1,0 +1,39 @@
+package com.openjfxroot.base;
+
+
+public class Client {
+
+   private int id;
+   private String lastName;
+
+   public Client(int id, String lastName) {
+      this.id = id;
+      this.lastName = lastName;
+   }
+
+   public Client(String lastName) {
+      this.lastName = lastName;
+   }
+
+   public Client(int id, String lastName) {
+      this.id = id;
+      this.lastName = lastName;
+   }
+
+   public int getId() {
+      return this.id;
+   }
+
+   public void setId(int id) {
+      this.id = id;
+   }
+
+   public String getLastName() {
+      return this.lastName;
+   }
+
+   public void setLastName(String lastName) {
+      this.lastName = lastName;
+   }
+
+}

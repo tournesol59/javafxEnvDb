@@ -1,0 +1,50 @@
+package com.openjfxroot.base;
+
+import javafx.beans.property.SimpleStringProperty;
+
+public class Article {
+
+  private int id;	
+  private SimpleStringProperty title = new SimpleStringProperty("");
+  // after first test, add other properties: owner, date
+
+  public Article() {
+    this("");
+  }
+
+  public Article(String stitle) {
+    super();
+    this.title = new SimpleStringProperty(stitle);
+  }
+
+  public Article(int id, String stitle) {
+    super();
+    this.id = id;
+    this.title = new SimpleStringProperty(stitle);
+  }
+
+  public SimpleStringProperty getTitleProperty() {
+    return this.title; 
+  }
+
+  public int getId() {
+    return this.id; 
+  }
+
+  public void setId(int id) {
+    this.id=id;
+  }
+
+  public String getTitle() {
+    return this.title.get(); 
+  }
+
+  public void setTitle(String stitle) {
+    this.title.set(stitle);
+  }
+
+  public String toString() {
+    return this.title.get();
+  } 
+}
+

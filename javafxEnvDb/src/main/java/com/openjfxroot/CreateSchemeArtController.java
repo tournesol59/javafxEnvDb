@@ -1,0 +1,62 @@
+package com.openjfxroot;
+
+import com.openjfxroot.base.Article;
+import com.openjfxroot.ArticleModel;
+import com.openjfxroot.ClientModel;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+//import javafx.scene.control.button;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+public class CreateSchemeArtController {
+// fred: a minimalist controller that just acts as a container for the Stage object to passed at construct
+// next things to do are implement a method initialize, which instanciates
+// the article model and the scheme view and calls the setter (this, articlemodel) to the new schemeview (this=itself as controller)
+   public final Stage primaryStage;
+   private AnchorPane rootlayout;
+   private MainApp mainApp;
+
+   // model classes (String properties among them)
+   private ArticleModel articleModel;
+   private ClientModel clientModel;
+   private CreateSchemeArtView schemeArtView;
+
+   public CreateSchemeArtController(Stage primaryStage) {
+      super();
+      this.primaryStage = primaryStage;
+   }
+
+   public final Stage getPrimaryStage() {
+      return primaryStage;
+   }
+
+   public void setMainApp(MainApp mainApp) {
+      this.mainApp = mainApp;
+   }
+
+   public void initialize() {
+      this.articleModel = new ArticleModel();
+      this.clientModel = new ClientModel();
+      this.schemeArtView = new CreateSchemeArtView(this, this.clientModel);
+      rootlayout = new AnchorPane();
+      rootlayout.getChildren().add(this.schemeArtView);
+      Scene scene = new Scene(rootlayout, 640, 480);
+      primaryStage.setScene(scene);
+      primaryStage.show();
+   }
+   
+   public void loadView(String viewName) {
+      System.out.println("the view "+viewName+" must be loaded");
+      if (viewName == "CreateSchemeArtView") {
+         rootlayout.getChildren().add(this.schemeArtView);
+	 Scene scene = new Scene(rootlayout, 640, 480);
+	 primaryStage.setScene(scene);
+      }
+   }
+
+   
+   
+}
+
