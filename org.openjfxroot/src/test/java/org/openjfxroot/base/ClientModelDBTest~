@@ -1,0 +1,9 @@
+package org.openjfxroot.base;
+
+import org.openjfxroot.base.Client;
+
+import java.sql.*;
+
+public class ClientModelDBTest {
+
+}
