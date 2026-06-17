@@ -24,11 +24,13 @@ public class UserModelDB {
 	private static IDataSource dataSrc;
 	private final static int DATABASE_CHOICE=2;  // 1=h2, 2=postgresql
 	private static UserModelDB INSTANCE;
-
+	private static Map<String, UserVLook> userVLookMap;  // static but must be loaded from file
+	
 	private static Long lastnumber; // par rapport à la taille de la listView
 	private static Long lastInsertedNr; // recupéré lors des inserts jdbc
 	private static Connection connect;
 	private static User selectUser;
+	//private static Order selectOrder;
 	
 	private List<User> listUsersStub = new ArrayList<User>();
 
@@ -36,7 +38,8 @@ public class UserModelDB {
 	public static void initUserPartDB() {
 		try {
 			/*!!!!  Here the selection of the database !!!! */
-			dataSrc = new DataSourcePSQL();
+			//dataSrc = new DataSourcePSQL(); //XOR:
+			dataSrc = new DataSourceH2();
 			//connect = DriverManager.getConnection("jdbc:h2:mem:clientdb", "SA", "");
 			connect = dataSrc.getConnection();
 			System.out.println("Connected manually to the H2 database");
@@ -102,46 +105,6 @@ public class UserModelDB {
 			System.out.println("error in UserModelDB:getAllUsers");
 			return null;
 		}
-	}
-	
-	public Map<String, UserVLook> loadUserVLook() {
-		Map<String, UserVLook> userVLookMap = new HashMap<String, UserVLook>();
-		String currentdelivery = "BEGIN";
-		String lastdelivery = "END";
-		int count=1;
-		try {
-			try (final InputStream input = this.getClass().getResourceAsStream("deliveryuser.txt"))
-			{
-				try (final LineNumberReader in = new LineNumberReader(new InputStreamReader(input)))
-				{	for (String line=in.readLine(); line != null; line = in.readLine()) {
-						line = line.trim();
-						if (line.isEmpty()) {
-							continue;
-						}
-						final String[] tokens = line.split("\\|");
-						currentdelivery = tokens[0];
-						if (currentdelivery != lastdelivery) {
-							count = 1;
-						}
-						User auser = new User("E", tokens[1], tokens[2], "");
-						OEnum delivery = OEnum.parse(tokens[0]);
-						UserVLook userVL = new UserVLook(delivery, auser);
-						StringBuilder stringBuilder = new StringBuilder(4);
-						stringBuilder.append(tokens[0]);
-						// the trick to generate a key that is close to the delivery code: eg MA1 => value
-						stringBuilder.append(Integer.toString(count));
-						String key = stringBuilder.toString();
-						// save in the map
-						userVLookMap.put(key, userVL);
-						lastdelivery = currentdelivery;
-						count++;
-					}
-				}
-			}
-		} catch (IOException | IllegalArgumentException | IndexOutOfBoundsException e) {
-			System.out.println("Error");
-		}
-		return userVLookMap;
 	}
 
 //	public List<User> getUsersByEnumType() {

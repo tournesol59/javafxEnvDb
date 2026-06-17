@@ -48,7 +48,23 @@ public class UserVLook {
 	
 	public boolean matchUser(User user) {
         boolean isEqual1 = Arrays.equals((this.userName), (user.getLastName().toCharArray()));
-        System.out.println("result match: "+isEqual1);
+        System.out.println("result username match: "+isEqual1);
         return isEqual1;
+	}
+	
+	public boolean matchDelivery(OEnum delivery) {
+		boolean isEqual2 = Arrays.equals((this.delivery), (delivery.getCode().toCharArray()));
+		System.out.println("result delivery match: "+isEqual2);
+		return isEqual2;
+	}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder("");
+		sb.append("[");
+		sb.append(this.getDelivery().toString());
+		sb.append("],[");
+		sb.append(this.getUserName().toString());
+		sb.append("]");
+		return sb.toString();
 	}
 }

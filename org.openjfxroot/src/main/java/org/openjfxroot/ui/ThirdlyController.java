@@ -1,10 +1,14 @@
 package org.openjfxroot.ui;
 
 import org.openjfxroot.App;
+import org.openjfxroot.ClientCellFactory;
+import org.openjfxroot.OrderCellFactory;
 import org.openjfxroot.base.Order;
 import org.openjfxroot.base.User;
 import org.openjfxroot.base.Client;
 import org.openjfxroot.base.OrderModelDB;
+import org.openjfxroot.base.User;
+import org.openjfxroot.base.AppModelVLook;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,6 +43,8 @@ import javafx.beans.value.WeakChangeListener;
 
 // cette classe controleur affiche grosso modo la meme vue que Secondary, basee sur l entite "Order"
 // mais avec une listView utilisant une fabrique pre construite
+// !!! TO DO NEXT implementer la ComboBox utilisateur dans la partie edition et traiter nouvelle value, old value
+// puis updateItem de la list view affichant aussi l'utilisateur maj.
 public class ThirdlyController implements Initializable {
 	
 	// singleton
@@ -46,7 +52,11 @@ public class ThirdlyController implements Initializable {
 	
 	@FXML
 	private VBox root;
-	
+
+	public VBox getRoot() {
+		return root;
+	}
+
 	@FXML
 	private ListView<Order> notesLV;
 	
@@ -56,15 +66,21 @@ public class ThirdlyController implements Initializable {
 	private Label lblSelection;
 	
 	@FXML
-	Label lblIndex;
+	private Label lblIndex;
 	
 	@FXML
-	TextField messageInput;
+	private Label lblClientName;
+	
+	@FXML
+	private Label lblClientDisp;
+	
+	@FXML
+	private TextField messageInput;
 
     public static ObservableList<Order> messagesList = FXCollections.observableArrayList();
 	
     // --- fred: this encapsulated way of programming shall replace in the future the static calls to App.setRoot(..)
-    public static ThirdlyController newInstance(Client client) {
+    public static ThirdlyController newInstance() {
     	FXMLLoader loader = new FXMLLoader(
     			ThirdlyController.class.getResource("thirdly.fxml"));
       if (INSTANCE == null) {
@@ -72,24 +88,37 @@ public class ThirdlyController implements Initializable {
     		loader.load();
     		System.out.println("thirdly view loaded");
     		INSTANCE = loader.getController();
+    		// fred: between the command above and the command below, UI are created, controls are injected here and
+    		// a call to initialize() is done: problem when INSTANCE global vars are used inside initialize
     		INSTANCE.orderModel = OrderModelDB.getInstance();
-    		INSTANCE.orderModel.setSelectClient(client);
+    		//INSTANCE.orderModel.setSelectClient(client); // to replaced with follows
+    		INSTANCE.modelVLook = AppModelVLook.getInstance();
+    		// the static way of calling was imposed below due to the fact that this class is self used as a singleton
+    		OrderModelDB.setSelectClient(AppModelVLook.getSelectClient());
     		return INSTANCE;
     	} catch (IOException ex) {
     		System.out.println("severe: thirdly fxml not loaded or controller is null: "+ex.getMessage());
+    		ex.printStackTrace();
     		return null;
     	}		
       }
       else return INSTANCE;
      }
     // ---    
-	public VBox getRoot() {
-		return root;
-	}
 	
 	// fred: classe statique car utilisee seulement a linterieur de cette classe
 	// a faire: rendre editable
 	static class OrderRectCell extends ListCell<Order> {
+		StringConverter<Order> converter=new StringConverter<Order>() {
+			@Override
+			public String toString(Order object) {
+				return object.getMessage();
+			}
+			@Override
+			public Order fromString(String name) {
+				return new Order(12, name);
+			}
+		};
 		@Override
 		public void updateItem(Order item, boolean empty) {
 			super.updateItem(item, empty);
@@ -104,8 +133,9 @@ public class ThirdlyController implements Initializable {
 			}
 		}
 	}
-	
+
 	protected static OrderModelDB orderModel;
+	
     public static OrderModelDB getOrderModel() {
     // ca marche car le model est un singleton
     	return orderModel;
@@ -117,95 +147,56 @@ public class ThirdlyController implements Initializable {
     	}
     }
     
-	// fred: une autre classe statique pour le converter
-	   //public class UserStringConverter extends 
-	
+    private static AppModelVLook modelVLook;
+    public static void setModelVLook() {
+    	if (modelVLook == null) {
+    		modelVLook = AppModelVLook.getInstance();
+    	}
+    }
+
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		//List<Order> notesList = new ArrayList<Order>();
-		
-		// data for ComboBox for editing the notes
-		messagesList.add(new Order(1, "reserve a play field"));
-		messagesList.add(new Order(2, "check in your reservation"));
-		messagesList.add(new Order(3, "select your payment mode"));
-		
-		// data in initialization
-		//obsvNotesList = FXCollections.observableArrayList(notesList);
-		orderModel = OrderModelDB.getInstance();
-		///obsvNotesList = orderModel.loaddataByClient();  // fred debug
-		List<Order> notesList = orderModel.getAllOrders();
+		// data for ListView in initialization
+		if (orderModel == null) {
+			System.out.println("Thirdly controller instanciation mistake in getting orderModel singleton");
+			orderModel = OrderModelDB.getInstance(); // fred: this has caused a very bad to find bug	
+		}
+	///obsvNotesList = orderModel.loaddataByClient();  // fred  debug
+		List<Order> notesList = orderModel.getAllOrdersByClient(); //modif of this func=> no args
+		/**
+    	Order order1 = new Order(1, 1, "try it out");
+    	Order order2 = new Order(2, 1, "you have got a mail");
+    	List<Order> notesList = new ArrayList<Order>();
+    	notesList.add(order1);
+    	notesList.add(order2);
+    	*/
     	obsvNotesList = FXCollections.observableArrayList();
     	for (Order order : notesList) {
     		obsvNotesList.add(order);
     	}
-		
-		//Callback<ListView<String>, ListCell<String>> {
-		/*** fred: the following below works but we want a dedicated factory
-		notesLV.setCellFactory(new Callback<ListView<Order>, ListCell<Order>>() {
-			@Override
-			public ListCell<Order> call(ListView<Order> param) {
-				return new TextFieldListCell<>(new StringConverter<Order>() {
-					@Override
-					public String toString(Order object) {
-						return object.getMessage();
-					}
-					// we do not need the following function
-					@Override
-					public Order fromString(String name) {
-						return new Order(11, name);
-					}
-				}) {
-					@Override
-					public void updateItem(Order order, boolean empty) {
-						super.updateItem(order, empty);
-						if (empty || order==null) {
-							setText(null);
-						} else {
-							setText(order.getMessage());
-						}
-					}
-				};
-			}
-		});
-		*/
-		// we use a ComboBoxListCell as for now, see OrderListCell implementation
+    	
+    	lblClientName.setText("Client ID/Name");
+    	
+    	lblClientDisp.setText(orderModel.getSelectClient().getLastName());
+    	
+	
+		notesLV.setEditable(true); // ne produit pas l'effet escompté car on n'a pas indiqué de Converter
 		/*
-		notesLV.setCellFactory(ComboBoxListCell.forListView(
-				new StringConverter<Order>() {
-					@Override
-					public String toString(Order object) {
-						return object.getMessage();
-					}
-					// we do not need the following function
-					@Override
-					public Order fromString(String name) {
-						return new Order(11, name);
-					}
-				}
-				, messagesList));
-		
-		*/
-		//notesLV.setEditable(true); // ne produit pas l'effet escompté car on n'a pas indiqué de Converter
-		/*
-		 * fred: last, this code differs by the previous to use a predefined textboxlistcell extension
-		 * and an override of the updateItem method
+		 * fred: last, this code follows the same pattern as in PrimaryController
 		 */
-		notesLV.setCellFactory(new Callback<ListView<Order>, 
-	            ListCell<Order>>() {
-            @Override 
-            public ListCell<Order> call(ListView<Order> list) {
-                return new OrderRectCell();
-            }
-        });
-		// last but not least: bind notesLV displau to ObservableList
+		notesLV.setCellFactory(new OrderCellFactory());
+		
+		// last but not least: bind notesLV display to ObservableList
 		notesLV.setItems(obsvNotesList);
 
 		notesLV.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Order>() {
 			@Override
 			public void changed(ObservableValue<? extends Order> observable, Order oldValue, Order newValue)
 			{
-				System.out.println("current order selection: old message="+oldValue.getMessage()+
+				if (oldValue != null) {
+					System.out.println("current order selection: old message="+oldValue.getMessage()+
 						", new message="+newValue.getMessage());
+				}
 				String arg0 = Integer.toString(notesLV.getSelectionModel().getSelectedIndex());
 				lblIndex.setText(arg0);
 				lblSelection.setText(newValue.getMessage());
@@ -228,7 +219,14 @@ public class ThirdlyController implements Initializable {
 	   
 	    @FXML
 	    public void switchToChecklist() throws IOException {
-	    	// fred: by-pass here: not checklist but select_user since checklist is under debug
-	        App.setRoot("select_user");
-	    }	   
+	        // App.setRoot("select_user");
+	        SelectController selectCtlr = SelectController.newInstance(); //(this.getOrderModel().getSelectClient());
+	       	System.out.println("thirdly controller new instanciated");
+	        selectCtlr.setUserModel();
+	        //NO good idea to store selectOrder in UserModel, prefer this
+	        AppModelVLook.setSelectOrder(this.getOrderModel().getSelectOrder());
+	    	// the static way to call setSelectOrder was forced due to the fact that this present instance is self used statically
+	        // pas besoin car OrderModel est une unique instance
+	       	System.out.println("selectOrder transmitted to select view");
+	       	App.setRootInstance(selectCtlr.getRoot());}	   
 }

@@ -3,6 +3,7 @@ package org.openjfxroot.ui;
 import org.openjfxroot.App;
 import org.openjfxroot.base.Order;
 import org.openjfxroot.base.User;
+import org.openjfxroot.base.AppModelVLook;
 import org.openjfxroot.base.Client;
 import org.openjfxroot.base.OrderModelDB;
 
@@ -48,45 +49,12 @@ public class SecondaryController implements Initializable {
 	@FXML
 	private VBox root;
 
-	@FXML
-	private ListView<String> notesLV;
-	
-	private ObservableList<String> obsvNotesList;
-	
-	@FXML
-	private Label lblIndex;
-	
-	@FXML
-	private Label lblSelection;
-	
-	@FXML
-	private TextField messageInput;
-    
- // --- fred: this encapsulated way of programming shall replace in the future the static calls to App.setRoot(..)
-    public static SecondaryController newInstance(Client client) {
-    	FXMLLoader loader = new FXMLLoader(
-    			SecondaryController.class.getResource("secondary.fxml"));
-       if (INSTANCE == null) {
-    	try {
-    		loader.load();
-    		System.out.println("secondary view loaded");
-    		INSTANCE = loader.getController();
-    		INSTANCE.orderModel = OrderModelDB.getInstance();
-    		INSTANCE.orderModel.setSelectClient(client);
-    		return INSTANCE;
-    	} catch (IOException ex) {
-    		System.out.println("severe: secondary fxml not loaded: "+ex.getMessage());
-    		return null;
-    	}		
-       }
-       else return INSTANCE;
-    }
     // ---
 	public VBox getRoot() {
 		return root;
 	}
 	
-    protected static OrderModelDB orderModel;
+    private static OrderModelDB orderModel;
     
     public static OrderModelDB getOrderModel() {
     // ca marche car le model est un singleton
@@ -99,14 +67,84 @@ public class SecondaryController implements Initializable {
     	}
     }
     
+    private static AppModelVLook modelVLook;
+    public static void setModelVLook() {
+    	if (modelVLook == null) {
+    		modelVLook = AppModelVLook.getInstance();
+    	}
+    }
+	
+	@FXML
+	private ListView<String> notesLV;
+	
+	private ObservableList<String> obsvNotesList;
+	
+	@FXML
+	private Label secondaryLabel;
+	
+	@FXML
+	private Label lblIndex;
+	
+	@FXML
+	private Label lblSelection;
+	
+	@FXML
+	private TextField messageInput;
+    
+ // --- fred: this encapsulated way of programming shall replace in the future the static calls to App.setRoot(..)
+
+	public SecondaryController(Client client) {
+		orderModel = OrderModelDB.getInstance();
+		orderModel.setSelectClient(client);
+	}
+	
+	public static SecondaryController newInstance(Client client) {
+    	FXMLLoader loader = new FXMLLoader(
+    			SecondaryController.class.getResource("secondary.fxml"));
+       if (INSTANCE == null) {
+    	try {
+    		// we follow the advices from stack overflow, choosing the option setController(...) 
+    		//instead of fxml hard coded controller, even if it has some disadvantages
+    		INSTANCE = new SecondaryController(client);
+       		loader.setController(INSTANCE);
+       		loader.load();
+       		return INSTANCE;
+    	} catch (IOException ex) {
+    		System.out.println("error: secondary controller not instanciated: "+ex.getMessage());
+    		ex.printStackTrace();
+    		return null;
+    	}		
+       }
+       else {
+    	 try {
+       		//INSTANCE.orderModel = OrderModelDB.getInstance();
+       		//INSTANCE.orderModel.setSelectClient(client);
+       		loader.setController(INSTANCE);
+       		System.out.println("before loading secondary view");
+       		loader.load();
+       		System.out.println("secondary view loaded");
+       		return INSTANCE;
+    	 } catch (IOException ex) {
+       		System.out.println("severe: secondary fxml not loaded: "+ex.getMessage());
+       		ex.printStackTrace();
+       		return null;
+       	}	
+       }
+    }
+//----
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
     // fred: here implement TBC the custom ListView
 	    //
 	    //
-    	orderModel = OrderModelDB.getInstance();
-    	List<Order> notesList = orderModel.getAllOrders();
+    	//orderModel = OrderModelDB.getInstance();
+    	//List<Order> notesList = orderModel.getAllOrders();
+    	Order order1 = new Order(1, 1, "try it out");
+    	Order order2 = new Order(2, 1, "you have got a mail");
+    	List<Order> notesList = new ArrayList<Order>();
+    	notesList.add(order1);
+    	notesList.add(order2);
     	obsvNotesList = FXCollections.observableArrayList();
     	for (Order order : notesList) {
     		obsvNotesList.add(order.getMessage());
@@ -116,7 +154,6 @@ public class SecondaryController implements Initializable {
     	StringConverter<String> converter = new DefaultStringConverter();
         notesLV.setEditable(true);
         notesLV.setCellFactory(param -> new TextFieldListCell(converter));
-   	//  notesLV.setCellFactory(new OrderCellFactory());
 
     	notesLV.setItems(obsvNotesList);
     	
@@ -135,8 +172,7 @@ public class SecondaryController implements Initializable {
     		  //System.out.println("current selection, old value="+oldValue+", new value="+newValue);   
     	});
     }
-    	
-
+    
    @FXML
    public void submitNoteToList() throws IOException
    {
@@ -152,11 +188,13 @@ public class SecondaryController implements Initializable {
    @FXML
    private void switchToThirdly() throws IOException {
        // App.setRoot("thirdly");
-   	ThirdlyController thirdlyCtlr = ThirdlyController.newInstance(this.getOrderModel().getSelectClient());
+   	ThirdlyController thirdlyCtlr = ThirdlyController.newInstance(); //(this.getOrderModel().getSelectClient());
    	System.out.println("thirdly controller new instanciated");
    	thirdlyCtlr.setOrderModel();
-   //	thirdlyCtlr.getOrderModel().setSelectClient(this.getOrderModel().getSelectClient());
-   	// pas besoin car OrderModel est une unique instance
+    thirdlyCtlr.getOrderModel().setSelectClient(this.getOrderModel().getSelectClient());
+	AppModelVLook.setSelectClient(this.getOrderModel().getSelectClient());
+	// the static way to call setSelectClient was forced due to the fact that this present instance is self used statically
+    // pas besoin car OrderModel est une unique instance
    	System.out.println("selectClient transmitted to thirdly view");
    	App.setRootInstance(thirdlyCtlr.getRoot());
    	

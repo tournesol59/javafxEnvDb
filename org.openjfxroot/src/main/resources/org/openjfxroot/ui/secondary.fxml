@@ -9,10 +9,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.geometry.Insets?>
 
-<VBox fx:id="root" alignment="CENTER" prefHeight="416.0" prefWidth="423.0" spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.openjfxroot.ui.SecondaryController">
+<VBox fx:id="root" alignment="CENTER" prefHeight="416.0" prefWidth="423.0" spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <ListView fx:id="notesLV" editable="true" prefHeight="200.0" prefWidth="200.0" />
-        <Label text="Secondary View" />
+        <Label fx:id="secondaryLabel" text="Secondary view" />
       <GridPane>
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

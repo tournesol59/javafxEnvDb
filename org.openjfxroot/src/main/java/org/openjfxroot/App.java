@@ -20,15 +20,18 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 640, 480);
+    	
+        scene = new Scene(loadFXML("ui/primary"), 640, 480);
         stage.setScene(scene);
-        stage.show();
-        /*
-         *     
-        PrimaryController primaryCtlr = PrimaryController.newInstance();
+/*
+        OrderCellController orderController = OrderCellController.newInstance();
+    	System.out.println("order controller new instanciated");
+    	App.setRootInstance( orderController.getRoot());
+  */  	
+        PrimaryController primaryController = PrimaryController.newInstance();
     	System.out.println("primary controller new instanciated");
-    	App.setRootInstance(primaryCtlr.getRoot());
-         */
+    	App.setRootInstance(primaryController.getRoot());
+        stage.show();        
     }
 
     public static void setRoot(String fxml) throws IOException {

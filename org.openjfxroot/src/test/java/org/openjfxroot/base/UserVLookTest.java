@@ -29,7 +29,6 @@ public class UserVLookTest {
     public void getUserVLookTest() {
     	UserVLook auserVLook = new UserVLook(typeen, auser);
     	/*
-    	
     	System.out.println("type: "+typeen.getCode());
 		String deliveryCodePoints = typeen.getCode().codePoints()
 				.limit(2)

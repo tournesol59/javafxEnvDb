@@ -7,6 +7,7 @@ import org.openjfxroot.ClientCellFactory;
 import org.openjfxroot.base.Client;
 import org.openjfxroot.base.ClientModelDB;
 import org.openjfxroot.base.User;
+import org.openjfxroot.base.AppModelVLook;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,7 +27,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
 public class PrimaryController implements Initializable {
-
+	
+	public static PrimaryController INSTANCE;
+	
 	@FXML
 	private VBox root;
 	
@@ -56,19 +59,37 @@ public class PrimaryController implements Initializable {
 	
 	private ObservableList<Client> clientObsvList;
 	
-	private ClientModelDB clientModel;
-	
+	private static ClientModelDB clientModel;
+    public static void setClientModel() {
+    // ca marche car le model est un singleton
+    	if (clientModel == null) {
+    		clientModel = ClientModelDB.getInstance();
+    	}
+    }
+    
+    private static AppModelVLook modelVLook;
+    public static void setModelVLook() {
+    	if (modelVLook == null) {
+    		modelVLook = AppModelVLook.getInstance();
+    	}
+    }
+    
 	// --- fred: this encapsulated way of programming shall replace in the future the static calls to App.setRoot(..)
 	public static PrimaryController newInstance() {
 		FXMLLoader loader = new FXMLLoader(
 				PrimaryController.class.getResource("primary.fxml"));
+	  if (INSTANCE == null) {
 		try {
+    		System.out.println("before loading primary view");
 			loader.load();
-			return loader.getController();
+    		System.out.println("primary view loaded");
+			INSTANCE = loader.getController();
 		} catch (IOException ex) {
 			System.out.println("severe: primary fxml not loaded: "+ex.getMessage());
 			return null;
 		}
+	  }
+	  return INSTANCE;
 	}
 	// ---
 	public VBox getRoot() {
@@ -76,8 +97,9 @@ public class PrimaryController implements Initializable {
 	}
 	
 	public void initialize(URL url, ResourceBundle rb) {
-		clientModel = ClientModelDB.getInstance();
-   	
+    	if (clientModel == null) {
+    		clientModel = ClientModelDB.getInstance();
+    	}
         //final ComboBox titleComboBox = new ComboBox();
         titleComboBox.getItems().addAll(
             "Mr.",
@@ -120,7 +142,10 @@ public class PrimaryController implements Initializable {
     private void switchToSecondary() throws IOException {
 // fred: cette partie doit etre bien revue avant de tester: cas de dépendance entre controller et modeles de vue differente
     	Client selectClient = clientObsvList.get(clientLV.getSelectionModel().selectedIndexProperty().get());
-
+    	System.out.println("selected client obtained, try to pass to second controller, name="+selectClient.getLastName());
+//    	App.setRoot("ui/secondary");
+    	modelVLook.setSelectClient(selectClient);
+    	   // select client redundant with
     	SecondaryController secondaryCtlr = SecondaryController.newInstance(selectClient);
     	System.out.println("secondary controller new instanciated");
     ///secondaryCtlr.getOrderModel().setSelectClient(selectClient);  // on essaie de passer selectClient dans le premier constructor	
