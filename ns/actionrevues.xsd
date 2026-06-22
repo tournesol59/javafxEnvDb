@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:tournesol59="http://www.github.com/tournesol59"
+targetNamespace="http://www.github.com/tournesol59/ns"
+>
+	<xsd:element name="actionrevues">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="tasktitle" type="xsd:string"/>
+				<xsd:element name="tasktype" type="xsd:string"/>
+
+			</xsd:sequence>
+			
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element name="review" type="xsd:string">
+						<xs:attribute name="lang" type="xs:string" default="en"/>
+				</xsd:element>
+			<xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
