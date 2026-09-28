@@ -58,6 +58,7 @@ public class UserModelDB {
 			stmt.executeUpdate("INSERT INTO tbluser(ustype, lastname, contactemail, contactpostal) VALUES ('E', 'Leaute', 'leautet4@cti.ecp.fr', 'Paris');");
 			stmt.close();
 			lastInsertedNr = Long.valueOf(2L);
+			System.out.println("Populating tbluser has succeeded");
 		} catch (Exception e) {
 			System.out.println("Populating tbluser failed");
 		}

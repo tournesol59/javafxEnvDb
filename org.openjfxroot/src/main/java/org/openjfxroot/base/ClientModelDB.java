@@ -51,12 +51,28 @@ public class ClientModelDB {
 			System.out.println("Populating tblclient failed");
 		}
 	}
+
+	// Other possibility of DataSource : on Disk database, this is design pattern Strategy
+	public static void initClientPartDBOnDisk() {
+		try {
+			dataSrc = new DataSourceOnDiskH2();
+			connect = dataSrc.getConnection();
+			System.out.println("Connected manually to the H2 disk database");
+		} catch (Exception e) {
+			System.out.println("Connection on Disk DataBase of tblclient failed");
+		}
+
+	}
 	
 	// the constructor designed to be singleton
 	private ClientModelDB() {
-		lastnumber=0L;
+		lastnumber=2L;
 		lastInsertedNr=0L;
-		initClientPartDB();
+	/*!!!!  Here the selection of the procedure that initiates database !!!! : option 1: memory database */
+	//	initClientPartDB();
+	/*!!! option 2: on disk database !!!*/
+		initClientPartDBOnDisk();
+
 		// test part only, shall be removed
 		//listClientsStub.add(new Client(1, "Georges", "Eddington", "test1s"));
 		//listClientsStub.add(new Client(2, "Georges", "Muir", "test2"));
@@ -100,7 +116,29 @@ public class ClientModelDB {
 
 		return obsvListCli;
 	}
-	
+
+	// implement findById only for test cases (junit)
+	public Client findById(int id) {
+		Client aClient=null;
+		try {
+			String sql = "SELECT * FROM tblclient WHERE id=?;";
+			PreparedStatement pstmt = connect.prepareStatement(sql);
+			pstmt.setInt(1, id);
+			ResultSet result = pstmt.executeQuery();
+			while (result.next()) {
+				aClient = new Client(result.getInt(1), result.getString(2), result.getString(3), result.getString(4));
+
+			}
+			result.close();
+			pstmt.close();
+			return aClient;
+		} catch (Exception e) {
+			System.out.println("error in ClientModelDB:findById");
+			return null;
+		}
+
+	}
+
 	// first level save as a new row operation
 	public void saveClient(Client client) {
 		List<Long> insertIds = new ArrayList<>();
@@ -116,7 +154,7 @@ public class ClientModelDB {
 		
 			ResultSet generatedKeys = pstmt.getGeneratedKeys();
 			System.out.println("saved Client "+client.getFirstName()+", lastInsertedNr: "+lastInsertedNr);
-						
+			
 			while (generatedKeys.next()) {
 				insertIds.add(generatedKeys.getLong(1));
 				count++;
@@ -125,6 +163,7 @@ public class ClientModelDB {
 			pstmt.close();
 			// note: the following line looks complicated but works
 			lastInsertedNr = Long.valueOf(insertIds.get(count-1).toString());
+			lastnumber++;
 			System.out.println("lastInsertedNr: "+lastInsertedNr);
 			
 			pstmt.close();

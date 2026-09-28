@@ -61,9 +61,13 @@ public class SelectController {
 	private ObservableList<User> userObsvList;
 	
 	// --- fred: this encapsulated way of programming shall replace in the future the static calls to App.setRoot(..)
+	public SelectController() {
+		userModel = UserModelDB.getInstance();
+	}
+
 	public static SelectController newInstance() {
 		FXMLLoader loader = new FXMLLoader(
-				SelectController.class.getResource("select_user.fxml"));
+				SelectController.class.getResource("selectuser.fxml"));
 	if (INSTANCE == null) {
 		try {
     		INSTANCE = new SelectController();
@@ -116,6 +120,7 @@ public class SelectController {
     }
 	public void initialize() {
 	    List<User> userList = new ArrayList<User>();
+	    System.out.println("select Controller at begin of initialization");
 		userList.add(new User("E", "Blake", "francis.blake@gmail.com", "London City"));
 		userList.add(new User("E", "Mortimer", "philip.mortimer@gmail.com", "Edinburgh"));
 		

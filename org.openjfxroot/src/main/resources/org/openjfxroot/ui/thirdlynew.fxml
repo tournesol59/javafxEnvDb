@@ -22,17 +22,20 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="lblSelection" text="Property" GridPane.rowIndex="3" />
-            <TextField fx:id="messageInput" prefHeight="14.0" prefWidth="191.0" text="Message" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-              <Button fx:id="thirdlyButton" onAction="#switchToSelectlist" text="Switch to Select user View" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Button fx:id="submitButton" mnemonicParsing="false" onAction="#submitNoteToList" prefHeight="31.0" prefWidth="170.0" text="Submit" GridPane.rowIndex="4" />
+            <Label fx:id="lblSelection" text="Property" GridPane.rowIndex="4" />
+            <TextField fx:id="messageInput" prefHeight="14.0" prefWidth="191.0" text="Message" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+              <Button fx:id="thirdlyButton" onAction="#switchToSelectlist" text="Switch to Select user View" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Button fx:id="submitButton" mnemonicParsing="false" onAction="#submitNoteToList" prefHeight="31.0" prefWidth="170.0" text="Submit" GridPane.rowIndex="5" />
             <Label fx:id="lblIndex" text="index" />
             <Label fx:id="lblClientName" text="ClientName" GridPane.rowIndex="1" />
-            <Label fx:id="lblClientDisp" text="ClientDisp" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label fx:id="lblClientDisp" text="ClientDisp" GridPane.rowIndex="2" />
+            <ComboBox fx:id="cboxUserName" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label fx:id="lblUserName" text="UserName" GridPane.rowIndex="3" />
          </children>
       </GridPane>
     </children>

@@ -29,9 +29,10 @@ public class ClientModelDBTest {
     public void saveClientTest() {
         Client newClient = new Client(3, "Edgar", "Poe", "golden beetle");
         modelDB.saveClient(newClient);
-        listClient = modelDB.getAllClients();
+        //listClient = modelDB.getAllClients();
+	//
         // next: remember to decrease max Id by one for List indexing
-        Client anotherClient = listClient.get(modelDB.getLastInsertedNr().intValue()-1);
+        Client anotherClient = modelDB.findById(modelDB.getLastInsertedNr().intValue()-1);
         Assert.assertEquals( "Error match Edgar P.", "Poe", anotherClient.getLastName());     	
     }
 

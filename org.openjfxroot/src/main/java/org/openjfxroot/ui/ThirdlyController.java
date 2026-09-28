@@ -218,11 +218,12 @@ public class ThirdlyController implements Initializable {
 	   }
 	   
 	    @FXML
-	    public void switchToChecklist() throws IOException {
+	    public void switchToSelectlist() throws IOException {
 	        // App.setRoot("select_user");
 	        SelectController selectCtlr = SelectController.newInstance(); //(this.getOrderModel().getSelectClient());
-	       	System.out.println("thirdly controller new instanciated");
+	       	System.out.println("selectcontroller new instanciated");
 	        selectCtlr.setUserModel();
+	       	System.out.println("userModel set for select view");
 	        //NO good idea to store selectOrder in UserModel, prefer this
 	        AppModelVLook.setSelectOrder(this.getOrderModel().getSelectOrder());
 	    	// the static way to call setSelectOrder was forced due to the fact that this present instance is self used statically
